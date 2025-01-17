@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stock Data</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        margin: 20px;
+      }
+      .stock {
+        margin-bottom: 30px;
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        color: #0073e6;
+      }
+      .error {
+        color: red;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid #ccc;
+      }
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f4f4f4;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      {% for stock, data in stock_data.items() %}
+      <div class="stock">
+        <h2>{{ stock }}</h2>
+        {% if data.error %}
+        <p class="error">{{ data.error }}</p>
+        {% else %}
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Open</th>
+              <th>Close</th>
+              <th>High</th>
+              <th>Low</th>
+              <th>Volume</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record in data %}
+            <tr>
+              <td>{{ record.t | timestamp_to_date }}</td>
+              <td>{{ record.o }}</td>
+              <td>{{ record.c }}</td>
+              <td>{{ record.h }}</td>
+              <td>{{ record.l }}</td>
+              <td>{{ record.v }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stock Prices</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/home.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Live Stock Prices</h1>
+      <div id="stocks">
+        <!-- Company stock data will be populated here -->
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+  </body>
+</html>
