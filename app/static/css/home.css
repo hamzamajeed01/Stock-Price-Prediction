@@ -199,3 +199,32 @@ input:focus {
         margin-right: 30px;
     }
 }
+
+
+/* Style for the dropdown */
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    background: 3498db;
+    border: 2px solid rgba(34, 150, 233, 0.2);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group select:focus {
+    border-color: #3498db; /* Blue color on focus */
+    outline: none;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Style for the label */
+.form-group label {
+    font-weight: 500;
+    color: #ffffff;
+}
+
+/* Margin for div inside form-group */
+.form-group div {
+    margin-bottom: 0.5rem;
+}

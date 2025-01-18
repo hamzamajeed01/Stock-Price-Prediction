@@ -113,16 +113,22 @@ def get_stock_data():
 def predict_close():
     if request.method == 'POST':
         try:
-            inputs = [
-                float(request.form.get('Open')),
-                float(request.form.get('High')),
-                float(request.form.get('Low')),
-                float(request.form.get('Volume'))
-            ]
+            # Retrieve the stock symbol from the form
+            stock_symbol = request.form.get('stock')
 
-            close_prediction = 23.45
+            # Simulate prediction logic (for now, hardcode the close prediction)
+            if stock_symbol == 'AAPL':
+                close_prediction = 145.67  # Hardcoded prediction for Apple
+            elif stock_symbol == 'GOOGL':
+                close_prediction = 2750.45  # Hardcoded prediction for Alphabet
+            elif stock_symbol == 'AMZN':
+                close_prediction = 3300.12  # Hardcoded prediction for Amazon
+            elif stock_symbol == 'MSFT':
+                close_prediction = 299.99  # Hardcoded prediction for Microsoft
+            else:
+                close_prediction = 23.45  # Default hardcoded prediction for General stock
+
+            # Return the prediction result
             return str(round(close_prediction, 2)) if close_prediction is not None else "Error: Stock model not loaded."
         except Exception as e:
             return f"An error occurred: {e}"
-    # If it's a GET request, render the stock.html page
-    return render_template('predict_stock.html')

@@ -58,30 +58,43 @@ function updateTicker(data) {
     const tickerItems = stockTicker.innerHTML;
     stockTicker.innerHTML = tickerItems + tickerItems;
 }
+// Add event listener to form submission
+
 
 predictionForm.addEventListener('submit', function(e) {
     e.preventDefault();
     
+    // Get the stock symbol from the dropdown
+    const stockSymbol = document.getElementById('stock').value; // Assuming the dropdown has ID 'stock'
+
+    // Create FormData object and append the selected stock symbol
     const formData = new FormData(predictionForm);
+    formData.append('stock', stockSymbol); // Append the selected stock symbol to the form data
+
+    // Show loading message
     predictionResult.className = 'prediction-result';
     predictionResult.textContent = 'Calculating prediction...';
     predictionResult.style.display = 'block';
 
+    // Send the request to the backend
     fetch('/predict_close', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.text())
+    .then(response => response.text()) // Parse the response
     .then(result => {
+        // Display the prediction result
         predictionResult.className = 'prediction-result success';
-        predictionResult.textContent = `Predicted Stock Price: $${parseFloat(result).toFixed(2)}`;
+        predictionResult.textContent = `Predicted Stock Price for ${stockSymbol}: $${parseFloat(result).toFixed(2)}`;
     })
     .catch(error => {
+        // Display error message if the prediction fails
         predictionResult.className = 'prediction-result error';
         predictionResult.textContent = 'Error calculating prediction. Please try again.';
         console.error('Prediction error:', error);
     });
 });
+
 
 fetchStockData();
 setInterval(fetchStockData, 15000); // Refresh every 15 seconds

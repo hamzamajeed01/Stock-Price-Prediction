@@ -26,6 +26,16 @@
         <h2>Predict Stock Price</h2>
         <form id="predictionForm">
           <div class="form-group">
+            <label for="stock">Select Stock</label>
+            <select id="stock" name="stock" required>
+              <option value="GEN">General</option>
+              <option value="AAPL">Apple Inc. (AAPL)</option>
+              <option value="GOOGL">Alphabet Inc. (GOOGL)</option>
+              <option value="AMZN">Amazon.com Inc. (AMZN)</option>
+              <option value="MSFT">Microsoft Corporation (MSFT)</option>
+            </select>
+          </div>
+          <div class="form-group">
             <label for="Open">Opening Price</label>
             <input type="number" step="0.01" id="Open" name="Open" required />
           </div>
