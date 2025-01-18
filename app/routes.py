@@ -95,3 +95,23 @@ def get_stock_data():
         data[stock] = stock_data
     print(data)
     return jsonify(data)
+
+
+
+@app.route('/predict_close', methods=['GET', 'POST'])
+def predict_close():
+    if request.method == 'POST':
+        try:
+            inputs = [
+                float(request.form.get('Open')),
+                float(request.form.get('High')),
+                float(request.form.get('Low')),
+                float(request.form.get('Volume'))
+            ]
+
+            close_prediction = 23.45
+            return str(round(close_prediction, 2)) if close_prediction is not None else "Error: Stock model not loaded."
+        except Exception as e:
+            return f"An error occurred: {e}"
+    # If it's a GET request, render the stock.html page
+    return render_template('stock.html')
