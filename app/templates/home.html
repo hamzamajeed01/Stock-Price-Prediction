@@ -1,12 +1,9 @@
-<!--    
-
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stock Prices</title>
+    <title>Stock Market Analytics</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/home.css') }}"
@@ -14,38 +11,45 @@
   </head>
   <body>
     <div class="container">
-      <h1>Live Stock Prices</h1>
-      <div id="stocks">
-        
+      <h1>Stock Market Analytics & Prediction</h1>
+
+      <!-- Stock Ticker Section -->
+      <div class="section ticker-section">
+        <h2>Live Stock Prices</h2>
+        <div class="ticker-wrap">
+          <div id="stockTicker" class="ticker"></div>
+        </div>
+      </div>
+
+      <!-- Stock Prediction Section -->
+      <div class="section prediction">
+        <h2>Predict Stock Price</h2>
+        <form id="predictionForm">
+          <div class="form-group">
+            <label for="Open">Opening Price</label>
+            <input type="number" step="0.01" id="Open" name="Open" required />
+          </div>
+
+          <div class="form-group">
+            <label for="High">Highest Price</label>
+            <input type="number" step="0.01" id="High" name="High" required />
+          </div>
+
+          <div class="form-group">
+            <label for="Low">Lowest Price</label>
+            <input type="number" step="0.01" id="Low" name="Low" required />
+          </div>
+
+          <div class="form-group">
+            <label for="Volume">Trading Volume</label>
+            <input type="number" id="Volume" name="Volume" required />
+          </div>
+
+          <button type="submit" class="predict-btn">Predict Price</button>
+        </form>
+        <div id="predictionResult" class="prediction-result"></div>
       </div>
     </div>
     <script src="{{ url_for('static', filename='js/home.js') }}"></script>
-  </body>
-</html>
- -->
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stock Price Predictor</title>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/home.css') }}"
-    />
-    <!-- Link to your CSS -->
-  </head>
-  <body>
-    <div class="container">
-      <h1>Welcome to Our Stock Price Predictor</h1>
-      <p>Use this tool to predict stock prices based on historical data.</p>
-      <nav>
-        <ul>
-          <li>
-            <a href="{{ url_for('predict_close') }}">Stock Price Prediction</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
   </body>
 </html>

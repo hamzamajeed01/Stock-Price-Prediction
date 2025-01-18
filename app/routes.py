@@ -44,6 +44,7 @@ API_KEY = "r_MlFnWgHnQaxrc0v2v9RC6K20cYx69D"
 BASE_URL = "https://api.polygon.io/v2/aggs/ticker/{stocksTicker}/range/{multiplier}/{timespan}/{start}/{to}"
 
 # Function to fetch stock data from the Polygon API
+# Modify the fetch_stock_data function to handle 429 status code
 def fetch_stock_data(ticker, multiplier=1, timespan="day", start_date=None, end_date=None):
     if not start_date:
         start_date = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
@@ -63,6 +64,11 @@ def fetch_stock_data(ticker, multiplier=1, timespan="day", start_date=None, end_
         "apiKey": API_KEY
     }
     response = requests.get(url, params=params)
+    
+    # Handle the 429 status code (rate limiting error)
+    if response.status_code == 429:
+        return {"error": "API rate limit exceeded. Please try again later."}
+    
     if response.status_code == 200:
         data = response.json()
         if "results" in data:
@@ -85,17 +91,22 @@ def fetch_stock_data(ticker, multiplier=1, timespan="day", start_date=None, end_
         return {"error": f"Failed to fetch data for {ticker}. Status code: {response.status_code}"}
 
 
-# Flask route to fetch stock data
+# Modify the /get_stock_data route to handle the API response
 @app.route("/get_stock_data", methods=["GET"])
 def get_stock_data():
     stocks = ["IBM", "GOOGL", "MSFT"]
     data = {}
+    
     for stock in stocks:
         stock_data = fetch_stock_data(stock)
         data[stock] = stock_data
+
+    # If any of the stocks has an error message, return that error
+    if any("error" in stock_data for stock_data in data.values()):
+        return jsonify({"error": "API rate limit exceeded. Please try again later."}), 429
+    
     print(data)
     return jsonify(data)
-
 
 
 @app.route('/predict_close', methods=['GET', 'POST'])
@@ -114,4 +125,4 @@ def predict_close():
         except Exception as e:
             return f"An error occurred: {e}"
     # If it's a GET request, render the stock.html page
-    return render_template('stock.html')
+    return render_template('predict_stock.html')
