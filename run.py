@@ -1,4 +1,4 @@
-from app import routes  # Import routes (which also initializes the app)
+from app import routes 
 
 if __name__ == "__main__":
-    routes.app.run(debug=True)  # Run the app from the routes module
+    routes.app.run(debug=True)

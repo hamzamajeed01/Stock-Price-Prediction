@@ -1,9 +1,13 @@
 import os
+
 import joblib
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 BASE_DIR = os.getcwd()
 MODELS_DIR = os.path.join(BASE_DIR, "Notebooks")
+
+
 def predict_stock_price(company_name, open_price, high_price, low_price, volume):
     try:
         print(company_name, open_price, high_price, low_price, volume)
@@ -21,16 +25,18 @@ def predict_stock_price(company_name, open_price, high_price, low_price, volume)
         X_scaler = joblib.load(X_scaler_name)
         y_scaler = joblib.load(y_scaler_name)
 
-        new_data = pd.DataFrame({
-            'Open': [open_price],
-            'High': [high_price],
-            'Low': [low_price],
-            'Volume': [volume]
-        })
+        new_data = pd.DataFrame(
+            {
+                "Open": [open_price],
+                "High": [high_price],
+                "Low": [low_price],
+                "Volume": [volume],
+            }
+        )
         new_data_scaled = X_scaler.transform(new_data)
         predictions_scaled = model.predict(new_data_scaled)
         predictions = y_scaler.inverse_transform(predictions_scaled.reshape(-1, 1))
-        result =  predictions[0][0]
+        result = predictions[0][0]
         return result
     except FileNotFoundError as e:
         return {"error": str(e)}

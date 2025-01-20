@@ -1,15 +1,24 @@
-from flask import Flask, render_template, request, redirect, url_for, flash,jsonify
-from app.database import add_user, authenticate_user, create_db
-import requests
 from datetime import datetime, timedelta
+
+import requests
+from flask import (Flask, flash, jsonify, redirect, render_template, request,
+                   url_for)
+
+from app.database import add_user, authenticate_user, create_db
+
 from .util import predict_stock_price
+
 app = Flask(__name__)
 import secrets
+
 app.secret_key = secrets.token_hex(16)
 create_db()
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
+
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -20,6 +29,7 @@ def login():
     else:
         flash("Invalid email or password. Please try again.")
         return redirect(url_for("index"))
+
 
 @app.route("/signup", methods=["POST"])
 def signup():
@@ -37,49 +47,52 @@ def signup():
         flash("A user with this email already exists.Please login instead.")
         return redirect(url_for("index"))
 
+
 @app.route("/home")
 def home():
-    return render_template("home.html")  
+    return render_template("home.html")
+
 
 API_KEY = "r_MlFnWgHnQaxrc0v2v9RC6K20cYx69D"
 BASE_URL = "https://api.polygon.io/v2/aggs/ticker/{stocksTicker}/range/{multiplier}/{timespan}/{start}/{to}"
 
+
 # Function to fetch stock data from the Polygon API
 # Modify the fetch_stock_data function to handle 429 status code
-def fetch_stock_data(ticker, multiplier=1, timespan="day", start_date=None, end_date=None):
+def fetch_stock_data(
+    ticker, multiplier=1, timespan="day", start_date=None, end_date=None
+):
     if not start_date:
         start_date = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
     if not end_date:
         end_date = datetime.now().strftime("%Y-%m-%d")
-    
+
     url = BASE_URL.format(
         stocksTicker=ticker,
         multiplier=multiplier,
         timespan=timespan,
         start=start_date,
-        to=end_date
+        to=end_date,
     )
-    params = {
-        "adjusted": "true",
-        "sort": "desc",
-        "apiKey": API_KEY
-    }
+    params = {"adjusted": "true", "sort": "desc", "apiKey": API_KEY}
     response = requests.get(url, params=params)
     if response.status_code == 429:
         return {"error": "API rate limit exceeded. Please try again later."}
-    
+
     if response.status_code == 200:
         data = response.json()
         if "results" in data:
             results = data["results"]
             stock_data = [
                 {
-                    "timestamp": datetime.utcfromtimestamp(item["t"] / 1000).strftime('%Y-%m-%d %H:%M:%S'),
+                    "timestamp": datetime.utcfromtimestamp(item["t"] / 1000).strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    ),
                     "open": item["o"],
                     "high": item["h"],
                     "low": item["l"],
                     "close": item["c"],
-                    "volume": item["v"]
+                    "volume": item["v"],
                 }
                 for item in results
             ]
@@ -87,43 +100,63 @@ def fetch_stock_data(ticker, multiplier=1, timespan="day", start_date=None, end_
         else:
             return {"error": f"No results found for {ticker}"}
     else:
-        return {"error": f"Failed to fetch data for {ticker}. Status code: {response.status_code}"}
+        return {
+            "error": f"Failed to fetch data for {ticker}. Status code: {response.status_code}"
+        }
+
 
 @app.route("/get_stock_data", methods=["GET"])
 def get_stock_data():
     stocks = ["IBM", "GOOGL", "MSFT"]
     data = {}
-    
+
     for stock in stocks:
         stock_data = fetch_stock_data(stock)
         data[stock] = stock_data
     if any("error" in stock_data for stock_data in data.values()):
-        return jsonify({"error": "API rate limit exceeded. Please try again later."}), 429
-    
+        return (
+            jsonify({"error": "API rate limit exceeded. Please try again later."}),
+            429,
+        )
+
     print(data)
     return jsonify(data)
 
 
-@app.route('/predict_close', methods=['GET', 'POST'])
+@app.route("/predict_close", methods=["GET", "POST"])
 def predict_close():
-    if request.method == 'POST':
+    if request.method == "POST":
         try:
-            stock_symbol = request.form.get('stock')
-            open_price=request.form.get('Open')
-            high_price=request.form.get('High')
-            low_price=request.form.get('Low')
-            volume=request.form.get('Volume')
-            print('Apple', open_price, high_price, low_price, volume)
-            if stock_symbol == 'AAPL':
-                result=predict_stock_price('Apple', open_price, high_price, low_price, volume)
-            elif stock_symbol == 'GOOGL':
-                result=predict_stock_price('Google', open_price, high_price, low_price, volume)
-            elif stock_symbol == 'AMZN':
-                result=predict_stock_price('Amazone', open_price, high_price, low_price, volume)
-            elif stock_symbol == 'MSFT':
-                result=predict_stock_price('Microsoft', open_price, high_price, low_price, volume)
+            stock_symbol = request.form.get("stock")
+            open_price = request.form.get("Open")
+            high_price = request.form.get("High")
+            low_price = request.form.get("Low")
+            volume = request.form.get("Volume")
+            print("Apple", open_price, high_price, low_price, volume)
+            if stock_symbol == "AAPL":
+                result = predict_stock_price(
+                    "Apple", open_price, high_price, low_price, volume
+                )
+            elif stock_symbol == "GOOGL":
+                result = predict_stock_price(
+                    "Google", open_price, high_price, low_price, volume
+                )
+            elif stock_symbol == "AMZN":
+                result = predict_stock_price(
+                    "Amazone", open_price, high_price, low_price, volume
+                )
+            elif stock_symbol == "MSFT":
+                result = predict_stock_price(
+                    "Microsoft", open_price, high_price, low_price, volume
+                )
             else:
-                result=predict_stock_price('general', open_price, high_price, low_price, volume)
-            return str(round(result, 2)) if result is not None else "Error: Stock model not loaded."
+                result = predict_stock_price(
+                    "general", open_price, high_price, low_price, volume
+                )
+            return (
+                str(round(result, 2))
+                if result is not None
+                else "Error: Stock model not loaded."
+            )
         except Exception as e:
             return f"An error occurred: {e}"
