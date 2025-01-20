@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash,json
 from app.database import add_user, authenticate_user, create_db
 import requests
 from datetime import datetime, timedelta
+from .util import predict_stock_price
 app = Flask(__name__)
 import secrets
 app.secret_key = secrets.token_hex(16)
@@ -64,8 +65,6 @@ def fetch_stock_data(ticker, multiplier=1, timespan="day", start_date=None, end_
         "apiKey": API_KEY
     }
     response = requests.get(url, params=params)
-    
-    # Handle the 429 status code (rate limiting error)
     if response.status_code == 429:
         return {"error": "API rate limit exceeded. Please try again later."}
     
@@ -90,8 +89,6 @@ def fetch_stock_data(ticker, multiplier=1, timespan="day", start_date=None, end_
     else:
         return {"error": f"Failed to fetch data for {ticker}. Status code: {response.status_code}"}
 
-
-# Modify the /get_stock_data route to handle the API response
 @app.route("/get_stock_data", methods=["GET"])
 def get_stock_data():
     stocks = ["IBM", "GOOGL", "MSFT"]
@@ -100,8 +97,6 @@ def get_stock_data():
     for stock in stocks:
         stock_data = fetch_stock_data(stock)
         data[stock] = stock_data
-
-    # If any of the stocks has an error message, return that error
     if any("error" in stock_data for stock_data in data.values()):
         return jsonify({"error": "API rate limit exceeded. Please try again later."}), 429
     
@@ -113,22 +108,22 @@ def get_stock_data():
 def predict_close():
     if request.method == 'POST':
         try:
-            # Retrieve the stock symbol from the form
             stock_symbol = request.form.get('stock')
-
-            # Simulate prediction logic (for now, hardcode the close prediction)
+            open_price=request.form.get('Open')
+            high_price=request.form.get('High')
+            low_price=request.form.get('Low')
+            volume=request.form.get('Volume')
+            print('Apple', open_price, high_price, low_price, volume)
             if stock_symbol == 'AAPL':
-                close_prediction = 145.67  # Hardcoded prediction for Apple
+                result=predict_stock_price('Apple', open_price, high_price, low_price, volume)
             elif stock_symbol == 'GOOGL':
-                close_prediction = 2750.45  # Hardcoded prediction for Alphabet
+                result=predict_stock_price('Google', open_price, high_price, low_price, volume)
             elif stock_symbol == 'AMZN':
-                close_prediction = 3300.12  # Hardcoded prediction for Amazon
+                result=predict_stock_price('Amazone', open_price, high_price, low_price, volume)
             elif stock_symbol == 'MSFT':
-                close_prediction = 299.99  # Hardcoded prediction for Microsoft
+                result=predict_stock_price('Microsoft', open_price, high_price, low_price, volume)
             else:
-                close_prediction = 23.45  # Default hardcoded prediction for General stock
-
-            # Return the prediction result
-            return str(round(close_prediction, 2)) if close_prediction is not None else "Error: Stock model not loaded."
+                result=predict_stock_price('general', open_price, high_price, low_price, volume)
+            return str(round(result, 2)) if result is not None else "Error: Stock model not loaded."
         except Exception as e:
             return f"An error occurred: {e}"

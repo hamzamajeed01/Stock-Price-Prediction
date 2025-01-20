@@ -37,22 +37,43 @@
           </div>
           <div class="form-group">
             <label for="Open">Opening Price</label>
-            <input type="number" step="0.01" id="Open" name="Open" required />
+            <input
+              type="number"
+              step="0.01"
+              id="Open"
+              name="Open"
+              min="0"
+              required
+            />
           </div>
 
           <div class="form-group">
             <label for="High">Highest Price</label>
-            <input type="number" step="0.01" id="High" name="High" required />
+            <input
+              type="number"
+              step="0.01"
+              id="High"
+              name="High"
+              min="0"
+              required
+            />
           </div>
 
           <div class="form-group">
             <label for="Low">Lowest Price</label>
-            <input type="number" step="0.01" id="Low" name="Low" required />
+            <input
+              type="number"
+              step="0.01"
+              id="Low"
+              name="Low"
+              min="0"
+              required
+            />
           </div>
 
           <div class="form-group">
             <label for="Volume">Trading Volume</label>
-            <input type="number" id="Volume" name="Volume" required />
+            <input type="number" id="Volume" name="Volume" min="0" required />
           </div>
 
           <button type="submit" class="predict-btn">Predict Price</button>

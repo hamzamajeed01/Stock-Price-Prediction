@@ -20,6 +20,9 @@ my_web_app/
 │   │   ├── about.html    # Example secondary page
 │   │   └── ...           # Additional HTML files
 │   └── utils.py          # Utility functions (optional)
+--------Notebooks/
+           |
+           ---- models and scalers
 
 ├── requirements.txt      # Python dependencies
 ├── run.py                # Entry point to run the app
