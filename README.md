@@ -70,5 +70,37 @@ Historical stock data was downloaded using [yfinance](https://pypi.org/project/y
 
 The data was preprocessed, cleaned, and used to train individual and general models.
 
-TO run the application create a .env file and do
-FINNHUB_API_KEY=your api key for finhub
+## How to Run
+
+### 1. Set Up Virtual Environment
+
+Create a virtual environment:
+
+python -m venv venv
+
+```
+
+### 2. Install Dependencies
+Activate the virtual environment and install the required packages:
+
+# On Windows
+venv\Scripts\activate
+
+# On macOS/Linux
+source venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+### 3. Configure Environment Variables
+
+Create a `.env` file in the project root directory and add your API key for Finnhub:
+
+```
+FINNHUB_API_KEY=your_api_key
+```
+
+### 4. Run the Application
+
+Execute the application:  
+python run.py
