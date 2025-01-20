@@ -78,11 +78,11 @@ Create a virtual environment:
 
 python -m venv venv
 
-```
-
 ### 2. Install Dependencies
+
 Activate the virtual environment and install the required packages:
 
+```
 # On Windows
 venv\Scripts\activate
 
@@ -102,5 +102,9 @@ FINNHUB_API_KEY=your_api_key
 
 ### 4. Run the Application
 
-Execute the application:  
+Execute the application:
+
+```
 python run.py
+
+```
