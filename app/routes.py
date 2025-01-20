@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-
+import finnhub
 import requests
 from flask import (Flask, flash, jsonify, redirect, render_template, request,
                    url_for)
@@ -7,7 +7,11 @@ from flask import (Flask, flash, jsonify, redirect, render_template, request,
 from app.database import add_user, authenticate_user, create_db
 
 from .util import predict_stock_price
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
+finnhub_client = finnhub.Client(api_key=os.getenv("FINNHUB_API_KEY"))
 app = Flask(__name__)
 import secrets
 
@@ -52,76 +56,31 @@ def signup():
 def home():
     return render_template("home.html")
 
-
-API_KEY = "r_MlFnWgHnQaxrc0v2v9RC6K20cYx69D"
-BASE_URL = "https://api.polygon.io/v2/aggs/ticker/{stocksTicker}/range/{multiplier}/{timespan}/{start}/{to}"
-
-
-# Function to fetch stock data from the Polygon API
-# Modify the fetch_stock_data function to handle 429 status code
-def fetch_stock_data(
-    ticker, multiplier=1, timespan="day", start_date=None, end_date=None
-):
-    if not start_date:
-        start_date = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
-    if not end_date:
-        end_date = datetime.now().strftime("%Y-%m-%d")
-
-    url = BASE_URL.format(
-        stocksTicker=ticker,
-        multiplier=multiplier,
-        timespan=timespan,
-        start=start_date,
-        to=end_date,
-    )
-    params = {"adjusted": "true", "sort": "desc", "apiKey": API_KEY}
-    response = requests.get(url, params=params)
-    if response.status_code == 429:
-        return {"error": "API rate limit exceeded. Please try again later."}
-
-    if response.status_code == 200:
-        data = response.json()
-        if "results" in data:
-            results = data["results"]
-            stock_data = [
-                {
-                    "timestamp": datetime.utcfromtimestamp(item["t"] / 1000).strftime(
-                        "%Y-%m-%d %H:%M:%S"
-                    ),
-                    "open": item["o"],
-                    "high": item["h"],
-                    "low": item["l"],
-                    "close": item["c"],
-                    "volume": item["v"],
-                }
-                for item in results
-            ]
-            return {"stock_data": stock_data, "meta": {"3. Last Refreshed": start_date}}
-        else:
-            return {"error": f"No results found for {ticker}"}
-    else:
+def fetch_stock_data(ticker):
+    try:
+        quote = finnhub_client.quote(ticker)
+        current_price = quote['c']
+        percent_change = quote['dp']
         return {
-            "error": f"Failed to fetch data for {ticker}. Status code: {response.status_code}"
+            "current_price": current_price,
+            "percent_change": percent_change
         }
-
+    except Exception as e:
+        return {"error": f"Failed to fetch data for {ticker}: {str(e)}"}
 
 @app.route("/get_stock_data", methods=["GET"])
 def get_stock_data():
-    stocks = ["IBM", "GOOGL", "MSFT"]
+    stocks = ["GOOGL", "MSFT", "AMZN", "AAPL"]
     data = {}
 
     for stock in stocks:
         stock_data = fetch_stock_data(stock)
         data[stock] = stock_data
+
     if any("error" in stock_data for stock_data in data.values()):
-        return (
-            jsonify({"error": "API rate limit exceeded. Please try again later."}),
-            429,
-        )
+        return jsonify({"error": "An error occurred while fetching stock data."}), 500
 
-    print(data)
     return jsonify(data)
-
 
 @app.route("/predict_close", methods=["GET", "POST"])
 def predict_close():

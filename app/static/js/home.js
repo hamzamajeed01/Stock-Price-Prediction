@@ -9,6 +9,7 @@ const stockTicker = document.getElementById('stockTicker');
 const predictionForm = document.getElementById('predictionForm');
 const predictionResult = document.getElementById('predictionResult');
 let previousPrices = {};
+
 function fetchStockData() {
     fetch('/get_stock_data')
         .then(response => response.json())
@@ -34,31 +35,51 @@ function fetchStockData() {
 }
 
 function updateTicker(data) {
-    stockTicker.innerHTML = ''; 
+    // Create a temporary container
+    const tempContainer = document.createElement('div');
+    tempContainer.className = 'ticker-content';
     
     Object.entries(data).forEach(([symbol, stockData]) => {
         if (!stockData.error) {
-            const currentPrice = parseFloat(stockData.stock_data[0].close);
+            const currentPrice = stockData.current_price;
+            const percentChange = stockData.percent_change;
             const prevPrice = previousPrices[symbol] || currentPrice;
             const priceMovement = currentPrice > prevPrice ? 'up' : currentPrice < prevPrice ? 'down' : 'none';
+            
             const tickerItem = document.createElement('div');
             tickerItem.className = 'ticker-item';
             tickerItem.innerHTML = `
-                <span class="ticker-symbol">${symbol}</span>
-                <span class="ticker-price ${priceMovement === 'up' ? 'price-up' : priceMovement === 'down' ? 'price-down' : ''}">
-                    $${currentPrice.toFixed(2)}
-                    ${priceMovement === 'up' ? '▲' : priceMovement === 'down' ? '▼' : ''}
-                </span>
+                <div class="company-info">
+                    <span class="ticker-symbol">${symbol}</span>
+                    <span class="company-name">${STOCKS[symbol]}</span>
+                </div>
+                <div class="price-info">
+                    <span class="ticker-price ${priceMovement === 'up' ? 'price-up' : priceMovement === 'down' ? 'price-down' : ''}">
+                        $${currentPrice.toFixed(2)}
+                    </span>
+                    <span class="percent-change ${percentChange >= 0 ? 'price-up' : 'price-down'}">
+                        ${percentChange >= 0 ? '▲' : '▼'} ${Math.abs(percentChange).toFixed(2)}%
+                    </span>
+                </div>
             `;
             
-            stockTicker.appendChild(tickerItem);
+            tempContainer.appendChild(tickerItem);
             previousPrices[symbol] = currentPrice;
         }
     });
-    const tickerItems = stockTicker.innerHTML;
-    stockTicker.innerHTML = tickerItems + tickerItems;
+    
+    // Clone the content for seamless animation
+    const clone = tempContainer.cloneNode(true);
+    
+    // Clear and update the ticker
+    stockTicker.innerHTML = '';
+    stockTicker.appendChild(tempContainer);
+    stockTicker.appendChild(clone);
 }
-// Add event listener to form submission
+
+// Initial load
+fetchStockData();
+setInterval(fetchStockData, 30000);
 
 
 predictionForm.addEventListener('submit', function(e) {
@@ -96,14 +117,3 @@ predictionForm.addEventListener('submit', function(e) {
 });
 
 
-fetchStockData();
-setInterval(fetchStockData, 15000); // Refresh every 15 seconds
-
-function restartAnimation() {
-    const ticker = document.getElementById('stockTicker');
-    ticker.style.animation = 'none';
-    ticker.offsetHeight; 
-    ticker.style.animation = null;
-    // console.log('Restarting animation');
-}
-stockTicker.addEventListener('animationend', restartAnimation);

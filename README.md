@@ -69,3 +69,6 @@ Historical stock data was downloaded using [yfinance](https://pypi.org/project/y
 - **Microsoft**
 
 The data was preprocessed, cleaned, and used to train individual and general models.
+
+TO run the application create a .env file and do
+FINNHUB_API_KEY=your api key for finhub

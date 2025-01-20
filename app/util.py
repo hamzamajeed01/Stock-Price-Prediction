@@ -37,6 +37,7 @@ def predict_stock_price(company_name, open_price, high_price, low_price, volume)
         predictions_scaled = model.predict(new_data_scaled)
         predictions = y_scaler.inverse_transform(predictions_scaled.reshape(-1, 1))
         result = predictions[0][0]
+        print(f"Predicted closing price for {company_name}: {result}")
         return result
     except FileNotFoundError as e:
         return {"error": str(e)}

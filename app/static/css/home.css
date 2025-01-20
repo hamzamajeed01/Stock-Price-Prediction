@@ -42,55 +42,87 @@ h2 {
     font-size: 1.8rem;
 }
 
-/* Ticker Section */
 .ticker-section {
     overflow: hidden;
     background: rgba(0, 0, 0, 0.3);
+    margin: 20px 0;
 }
 
 .ticker-wrap {
     width: 100%;
     overflow: hidden;
-    height: 80px;
+    height: 100px;
     background: rgba(0, 0, 0, 0.2);
     padding: 20px;
     border-radius: 10px;
+    position: relative;
 }
 
 .ticker {
-    display: inline-flex;
+    display: flex;
     white-space: nowrap;
-    padding-right: 100%;
-    animation: ticker 20s linear infinite;
+    animation: tickerAnimation 40s linear infinite;
 }
 
-@keyframes ticker {
+@keyframes tickerAnimation {
     0% {
-        transform: translateX(100%);
+        transform: translate3d(100%, 0, 0);
     }
     100% {
-        transform: translateX(-100%);
+        transform: translate3d(-100%, 0, 0);
     }
+}
+
+.ticker-content {
+    display: inline-flex;
+    padding-right: 20px;
 }
 
 .ticker-item {
     display: inline-flex;
     align-items: center;
-    margin-right: 30px;
-    padding: 10px 20px;
+    justify-content: space-between;
+    margin-right: 40px;
+    padding: 15px 25px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 300px;
+}
+
+.company-info {
+    display: flex;
+    flex-direction: column;
+    margin-right: 20px;
 }
 
 .ticker-symbol {
     font-weight: bold;
     color: #3498db;
-    margin-right: 10px;
+    font-size: 1.2em;
+    margin-bottom: 4px;
+}
+
+.company-name {
+    color: #999;
+    font-size: 0.9em;
+}
+
+.price-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
 .ticker-price {
+    font-weight: bold;
     color: #fff;
+    font-size: 1.1em;
+    margin-bottom: 4px;
+}
+
+.percent-change {
+    font-size: 0.9em;
 }
 
 .price-up {
@@ -100,7 +132,6 @@ h2 {
 .price-down {
     color: #e74c3c;
 }
-
 /* Prediction Form Section */
 .prediction {
     background: rgba(255, 255, 255, 0.1);
@@ -109,6 +140,8 @@ h2 {
 .form-group {
     margin-bottom: 1.5rem;
 }
+
+
 
 label {
     display: block;
@@ -175,30 +208,7 @@ input:focus {
     border: 1px solid rgba(231, 76, 60, 0.3);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    body {
-        padding: 1rem;
-    }
 
-    h1 {
-        font-size: 2rem;
-    }
-
-    .section {
-        padding: 1.5rem;
-    }
-
-    .ticker-wrap {
-        height: 60px;
-        padding: 10px;
-    }
-
-    .ticker-item {
-        padding: 8px 15px;
-        margin-right: 30px;
-    }
-}
 
 
 /* Style for the dropdown */
