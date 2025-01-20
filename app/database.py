@@ -1,5 +1,7 @@
 import sqlite3
+
 from werkzeug.security import check_password_hash, generate_password_hash
+
 
 def create_db():
     conn = sqlite3.connect("users.db")
@@ -15,10 +17,11 @@ def create_db():
     conn.commit()
     conn.close()
 
+
 def add_user(first_name, last_name, email, password):
     conn = sqlite3.connect("users.db")
     cursor = conn.cursor()
-    
+
     try:
         cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
         user = cursor.fetchone()
@@ -31,17 +34,18 @@ def add_user(first_name, last_name, email, password):
             (first_name, last_name, email, hashed_password),
         )
         conn.commit()
-        
+
         # Fetch the newly created user to return their data
         cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
         new_user = cursor.fetchone()
         return new_user
-        
+
     except Exception as e:
         print(f"Error adding user: {e}")
         return None
     finally:
         conn.close()
+
 
 def authenticate_user(email, password):
     conn = sqlite3.connect("users.db")
@@ -54,17 +58,18 @@ def authenticate_user(email, password):
         if user and check_password_hash(user[4], password):
             return user  # Return the entire user tuple
         return None
-        
+
     except Exception as e:
         print(f"Error authenticating user: {e}")
         return None
     finally:
         conn.close()
 
+
 def get_user_by_id(user_id):
     conn = sqlite3.connect("users.db")
     cursor = conn.cursor()
-    
+
     try:
         cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
         user = cursor.fetchone()
