@@ -2,7 +2,16 @@ const STOCKS = {
     'AAPL': 'Apple Inc.',
     'GOOGL': 'Alphabet Inc.',
     'MSFT': 'Microsoft Corporation',
-    'AMZN': 'Amazon.com Inc.'
+    'AMZN': 'Amazon.com Inc.',
+    'TSLA': 'Tesla Inc.',
+    'NFLX': 'Netflix Inc.',
+    'NVDA': 'NVIDIA Corporation',
+    'META': 'Meta Platforms Inc.',
+    'BTC': 'Bitcoin',
+    'ETH': 'Ethereum',
+    'DOGE': 'Dogecoin',
+    'BNB': 'Binance Coin',
+    'XRP': 'Ripple'
 };
 
 const stockTicker = document.getElementById('stockTicker');
@@ -35,23 +44,22 @@ function fetchStockData() {
 }
 
 function updateTicker(data) {
-    // Create a temporary container
     const tempContainer = document.createElement('div');
     tempContainer.className = 'ticker-content';
-    
+
     Object.entries(data).forEach(([symbol, stockData]) => {
         if (!stockData.error) {
             const currentPrice = stockData.current_price;
             const percentChange = stockData.percent_change;
             const prevPrice = previousPrices[symbol] || currentPrice;
             const priceMovement = currentPrice > prevPrice ? 'up' : currentPrice < prevPrice ? 'down' : 'none';
-            
+
             const tickerItem = document.createElement('div');
             tickerItem.className = 'ticker-item';
             tickerItem.innerHTML = `
                 <div class="company-info">
                     <span class="ticker-symbol">${symbol}</span>
-                    <span class="company-name">${STOCKS[symbol]}</span>
+                    <span class="company-name">${STOCKS[symbol] || symbol}</span>
                 </div>
                 <div class="price-info">
                     <span class="ticker-price ${priceMovement === 'up' ? 'price-up' : priceMovement === 'down' ? 'price-down' : ''}">
@@ -62,24 +70,20 @@ function updateTicker(data) {
                     </span>
                 </div>
             `;
-            
+
             tempContainer.appendChild(tickerItem);
             previousPrices[symbol] = currentPrice;
         }
     });
-    
-    // Clone the content for seamless animation
-    const clone = tempContainer.cloneNode(true);
-    
-    // Clear and update the ticker
+
     stockTicker.innerHTML = '';
     stockTicker.appendChild(tempContainer);
-    stockTicker.appendChild(clone);
 }
+
 
 // Initial load
 fetchStockData();
-setInterval(fetchStockData, 30000);
+setInterval(fetchStockData, 60000);
 
 
 predictionForm.addEventListener('submit', function(e) {

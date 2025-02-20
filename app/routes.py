@@ -101,57 +101,51 @@ def fetch_stock_data(ticker):
         return {"current_price": current_price, "percent_change": percent_change}
     except Exception as e:
         return {"error": f"Failed to fetch data for {ticker}: {str(e)}"}
+    
+    
+def get_all_stock_data():
+    stocks = ["GOOGL", "MSFT", "AMZN", "AAPL", "TSLA", "NFLX", "NVDA", "META"]
+    cryptos = ["BINANCE:BTCUSDT", "BINANCE:ETHUSDT", "BINANCE:DOGEUSDT", "BINANCE:BNBUSDT", "BINANCE:XRPUSDT"]
 
+    all_data = {}
+
+    for stock in stocks + cryptos:
+        stock_data = fetch_stock_data(stock)
+        all_data[stock] = stock_data
+
+    return all_data
 
 @app.route("/get_stock_data", methods=["GET"])
 def get_stock_data():
-    stocks = ["GOOGL", "MSFT", "AMZN", "AAPL"]
-    data = {}
-
-    for stock in stocks:
-        stock_data = fetch_stock_data(stock)
-        data[stock] = stock_data
-
+    data = get_all_stock_data()
+    
     if any("error" in stock_data for stock_data in data.values()):
         return jsonify({"error": "An error occurred while fetching stock data."}), 500
 
     return jsonify(data)
 
 
-@app.route("/predict_close", methods=["GET", "POST"])
+
+
+
+@app.route("/predict_close", methods=["POST"])
 def predict_close():
-    if request.method == "POST":
-        try:
-            stock_symbol = request.form.get("stock")
-            open_price = request.form.get("Open")
-            high_price = request.form.get("High")
-            low_price = request.form.get("Low")
-            volume = request.form.get("Volume")
-            print("Apple", open_price, high_price, low_price, volume)
-            if stock_symbol == "AAPL":
-                result = predict_stock_price(
-                    "Apple", open_price, high_price, low_price, volume
-                )
-            elif stock_symbol == "GOOGL":
-                result = predict_stock_price(
-                    "Google", open_price, high_price, low_price, volume
-                )
-            elif stock_symbol == "AMZN":
-                result = predict_stock_price(
-                    "Amazone", open_price, high_price, low_price, volume
-                )
-            elif stock_symbol == "MSFT":
-                result = predict_stock_price(
-                    "Microsoft", open_price, high_price, low_price, volume
-                )
-            else:
-                result = predict_stock_price(
-                    "general", open_price, high_price, low_price, volume
-                )
-            return (
-                str(round(result, 2))
-                if result is not None
-                else "Error: Stock model not loaded."
-            )
-        except Exception as e:
-            return f"An error occurred: {e}"
+    try:
+        stock_symbol = request.form.get("stock")
+        open_price = request.form.get("Open")
+        high_price = request.form.get("High")
+        low_price = request.form.get("Low")
+        volume = request.form.get("Volume")
+
+        symbol_map = {
+            "AAPL": "Apple", "GOOGL": "Google", "AMZN": "Amazon", "MSFT": "Microsoft",
+            "TSLA": "Tesla", "NFLX": "Netflix", "NVDA": "Nvidia", "META": "Meta",
+            "BTC": "Bitcoin", "ETH": "Ethereum", "DOGE": "Dogecoin", "BNB": "Binance", "XRP": "Ripple"
+        }
+
+        result = predict_stock_price(symbol_map.get(stock_symbol, "general"), open_price, high_price, low_price, volume)
+
+        return str(round(result, 2)) if result is not None else "Error: Stock model not loaded."
+
+    except Exception as e:
+        return f"An error occurred: {e}"
