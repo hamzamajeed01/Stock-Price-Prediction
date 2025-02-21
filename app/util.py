@@ -8,7 +8,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
-
+import pytz
 BASE_DIR = os.getcwd()
 MODELS_DIR = os.path.join(BASE_DIR, "Notebooks")
 
@@ -64,6 +64,9 @@ def send_stock_alert_email(recipient_email, stock_symbol, current_price, percent
         if not all([smtp_username, smtp_password]):
             raise ValueError("SMTP credentials not configured")
 
+        utc_now = datetime.utcnow()  # Get current UTC time
+        eastern_tz = pytz.timezone("America/New_York")  # Eastern Time Zone (EST/EDT)
+        est_now = utc_now.replace(tzinfo=pytz.utc).astimezone(eastern_tz)
         msg = MIMEMultipart()
         msg['From'] = smtp_username
         msg['To'] = recipient_email
@@ -75,7 +78,7 @@ def send_stock_alert_email(recipient_email, stock_symbol, current_price, percent
                 <h2>Stock Price Alert for {stock_symbol}</h2>
                 <p>Current Price: ${current_price:.2f}</p>
                 <p>24h Change: {percent_change:+.2f}%</p>
-                <p>Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+                <p>Time: {est_now.strftime('%Y-%m-%d %H:%M:%S')} EST</p>
                 <p>This is an automated alert from your Stock Price Predictor.</p>
             </body>
         </html>

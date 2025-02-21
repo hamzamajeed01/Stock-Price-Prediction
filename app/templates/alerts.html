@@ -19,6 +19,14 @@
   </head>
   <body>
     <div class="container">
+      <!-- Move Navigation above the title -->
+      <div class="navigation" style="justify-content: flex-start; margin: 0 0 2rem;">
+        <a href="{{ url_for('home') }}" class="nav-link">
+          <i class="fas fa-home"></i>
+          Back to Home
+        </a>
+      </div>
+
       <h1><i class="fas fa-bell"></i> Stock Price Alerts</h1>
 
       <!-- Flash Messages -->
@@ -126,14 +134,6 @@
           <p>You haven't set any alerts yet.</p>
         </div>
         {% endif %}
-      </div>
-
-      <!-- Navigation -->
-      <div class="navigation">
-        <a href="{{ url_for('home') }}" class="nav-link">
-          <i class="fas fa-home"></i>
-          Back to Home
-        </a>
       </div>
     </div>
   </body>
