@@ -241,13 +241,118 @@ input:focus {
 /* Alert Section Styles */
 .alert-section {
     margin-bottom: 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.alert-section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
 .alert-form {
-    max-width: 600px;
+    max-width: 800px;
     margin: 0 auto;
+    padding: 2rem;
 }
 
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+    color: #fff;
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.form-group label i {
+    color: #3498db;
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper::after {
+    content: '\f107';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #3498db;
+    pointer-events: none;
+}
+
+.form-group select {
+    width: 100%;
+    padding: 12px 35px 12px 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(52, 152, 219, 0.3);
+    border-radius: 10px;
+    font-size: 1rem;
+    color: #fff;
+    appearance: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-group select:focus {
+    border-color: #3498db;
+    background: rgba(255, 255, 255, 0.15);
+    outline: none;
+}
+
+.form-group select option {
+    background: #2c3e50;
+    color: #fff;
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.submit-btn:hover {
+    background: linear-gradient(135deg, #2980b9, #3498db);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+}
+
+.submit-btn i {
+    font-size: 1.2rem;
+}
+
+/* Current Alerts Styles */
 .alerts-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -257,74 +362,122 @@ input:focus {
 
 .alert-card {
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
+    border-radius: 15px;
     padding: 1.5rem;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.alert-info h3 {
-    color: #3498db;
-    margin-bottom: 0.5rem;
-    font-size: 1.2rem;
-}
-
-.alert-info .symbol {
-    color: #fff;
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-}
-
-.alert-info .frequency {
-    color: #bbb;
-    margin-bottom: 0.5rem;
-}
-
-.alert-info .last-alert {
-    color: #999;
-    font-size: 0.9rem;
-}
-
-.delete-form {
-    margin-top: 1rem;
-}
-
-.delete-btn {
-    background: #e74c3c;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
     transition: all 0.3s ease;
 }
 
+.alert-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.stock-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+}
+
+.stock-header i {
+    color: #3498db;
+    font-size: 1.5rem;
+}
+
+.alert-info h3 {
+    color: #fff;
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.alert-info .symbol {
+    color: #3498db;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.alert-info .frequency,
+.alert-info .last-alert {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #bbb;
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+}
+
+.alert-info i {
+    color: #3498db;
+}
+
+.delete-btn {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    font-size: 1rem;
+}
+
 .delete-btn:hover {
-    background: #c0392b;
+    background: linear-gradient(135deg, #c0392b, #e74c3c);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
 }
 
 .no-alerts {
     text-align: center;
-    color: #999;
-    margin-top: 1rem;
+    color: #bbb;
+    padding: 3rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
 }
 
-.flash-messages {
-    margin-bottom: 1.5rem;
+.no-alerts i {
+    font-size: 3rem;
+    color: #3498db;
+    opacity: 0.5;
 }
 
 .flash-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     background: rgba(52, 152, 219, 0.2);
     color: #3498db;
     padding: 1rem;
-    border-radius: 5px;
-    margin-bottom: 0.5rem;
-    text-align: center;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    animation: slideIn 0.3s ease;
 }
 
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Navigation Styles */
 .navigation {
     display: flex;
     justify-content: center;
@@ -333,15 +486,20 @@ input:focus {
 }
 
 .nav-link {
-    background: #3498db;
+    background: linear-gradient(135deg, #3498db, #2980b9);
     color: white;
     text-decoration: none;
-    padding: 10px 20px;
-    border-radius: 5px;
+    padding: 12px 25px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     transition: all 0.3s ease;
+    font-weight: 500;
 }
 
 .nav-link:hover {
-    background: #2980b9;
+    background: linear-gradient(135deg, #2980b9, #3498db);
     transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
 }
