@@ -62,23 +62,23 @@ h2 {
 
 .ticker {
     display: flex;
+    padding: 0;
     white-space: nowrap;
-    animation: tickerAnimation 60s linear infinite; /* Continuous movement */
-    width: max-content; /* Allows seamless looping */
+    animation: tickerAnimation linear infinite;
 }
 
 @keyframes tickerAnimation {
-    from {
+    0% {
         transform: translateX(0);
     }
-    to {
-        transform: translateX(-50%); /* Scrolls halfway before looping */
+    100% {
+        transform: translateX(-50%);
     }
 }
 
 .ticker-content {
     display: flex;
-    padding-right: 20px;
+    padding: 0;
 }
 
 .ticker-item {
@@ -91,6 +91,7 @@ h2 {
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     min-width: 300px;
+    transition: all 0.3s ease;
 }
 
 .company-info {

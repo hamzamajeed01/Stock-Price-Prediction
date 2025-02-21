@@ -18,32 +18,44 @@ const stockTicker = document.getElementById('stockTicker');
 const predictionForm = document.getElementById('predictionForm');
 const predictionResult = document.getElementById('predictionResult');
 let previousPrices = {};
+let tickerInitialized = false;
+let animationDuration = 0;
+let dataFetchInterval = null;
 
-function fetchStockData() {
-    fetch('/get_stock_data')
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                stockTicker.innerHTML = `
-                    <div class="error-message">
-                        ${data.error}
-                    </div>
-                `;
-            } else {
-                updateTicker(data);
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching stock data:', error);
-            stockTicker.innerHTML = `
-                <div class="error-message">
-                    Failed to fetch stock data. Please try again later.
-                </div>
-            `;
-        });
+function updateTickerData(data) {
+    const tickerItems = document.querySelectorAll('.ticker-item');
+    
+    if (!tickerItems.length) {
+        // If ticker items don't exist (possibly due to previous error), reinitialize
+        initializeTicker(data);
+        return;
+    }
+
+    tickerItems.forEach(item => {
+        const symbol = item.querySelector('.ticker-symbol').textContent;
+        const stockData = data[symbol];
+        
+        if (stockData && !stockData.error) {
+            const currentPrice = stockData.current_price;
+            const percentChange = stockData.percent_change;
+            const prevPrice = previousPrices[symbol] || currentPrice;
+            const priceMovement = currentPrice > prevPrice ? 'up' : currentPrice < prevPrice ? 'down' : 'none';
+
+            const priceElement = item.querySelector('.ticker-price');
+            const percentElement = item.querySelector('.percent-change');
+
+            priceElement.textContent = `$${currentPrice.toFixed(2)}`;
+            priceElement.className = `ticker-price ${priceMovement === 'up' ? 'price-up' : priceMovement === 'down' ? 'price-down' : ''}`;
+            
+            percentElement.textContent = `${percentChange >= 0 ? '▲' : '▼'} ${Math.abs(percentChange).toFixed(2)}%`;
+            percentElement.className = `percent-change ${percentChange >= 0 ? 'price-up' : 'price-down'}`;
+
+            previousPrices[symbol] = currentPrice;
+        }
+    });
 }
 
-function updateTicker(data) {
+function initializeTicker(data) {
     const tempContainer = document.createElement('div');
     tempContainer.className = 'ticker-content';
 
@@ -51,8 +63,6 @@ function updateTicker(data) {
         if (!stockData.error) {
             const currentPrice = stockData.current_price;
             const percentChange = stockData.percent_change;
-            const prevPrice = previousPrices[symbol] || currentPrice;
-            const priceMovement = currentPrice > prevPrice ? 'up' : currentPrice < prevPrice ? 'down' : 'none';
 
             const tickerItem = document.createElement('div');
             tickerItem.className = 'ticker-item';
@@ -62,7 +72,7 @@ function updateTicker(data) {
                     <span class="company-name">${STOCKS[symbol] || symbol}</span>
                 </div>
                 <div class="price-info">
-                    <span class="ticker-price ${priceMovement === 'up' ? 'price-up' : priceMovement === 'down' ? 'price-down' : ''}">
+                    <span class="ticker-price">
                         $${currentPrice.toFixed(2)}
                     </span>
                     <span class="percent-change ${percentChange >= 0 ? 'price-up' : 'price-down'}">
@@ -76,15 +86,73 @@ function updateTicker(data) {
         }
     });
 
+    // Clone the ticker items to create a seamless loop
+    const clone = tempContainer.cloneNode(true);
+    
     stockTicker.innerHTML = '';
-    stockTicker.appendChild(tempContainer);
+    const wrapper = document.createElement('div');
+    wrapper.className = 'ticker-wrap';
+    
+    const ticker = document.createElement('div');
+    ticker.className = 'ticker';
+    
+    ticker.appendChild(tempContainer);
+    ticker.appendChild(clone);
+    
+    wrapper.appendChild(ticker);
+    stockTicker.appendChild(wrapper);
+
+    // Calculate animation duration based on content width
+    const contentWidth = tempContainer.offsetWidth;
+    animationDuration = contentWidth / 50; // Increased speed (changed from 25 to 50)
+    ticker.style.animationDuration = `${animationDuration}s`;
+
+    // Reset and start new data fetch interval
+    if (dataFetchInterval) {
+        clearInterval(dataFetchInterval);
+    }
+    // Set interval to fetch new data at 75% of animation duration
+    const fetchInterval = Math.max(animationDuration * 750, 10000); // minimum 10 seconds
+    dataFetchInterval = setInterval(fetchStockData, fetchInterval);
 }
 
+function fetchStockData() {
+    fetch('/get_stock_data')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            if (!tickerInitialized) {
+                initializeTicker(data);
+                tickerInitialized = true;
+            } else {
+                updateTickerData(data);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching stock data:', error);
+            // Don't clear existing ticker on error if it's already initialized
+            if (!tickerInitialized) {
+                stockTicker.innerHTML = `
+                    <div class="error-message">
+                        Failed to fetch stock data. Retrying...
+                    </div>
+                `;
+            }
+            // Retry after 5 seconds on error
+            setTimeout(fetchStockData, 5000);
+        });
+}
 
 // Initial load
 fetchStockData();
-setInterval(fetchStockData, 60000);
-
 
 predictionForm.addEventListener('submit', function(e) {
     e.preventDefault();
