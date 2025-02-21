@@ -1,8 +1,13 @@
 import os
+import time
 
 import joblib
 import numpy as np
 import pandas as pd
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from datetime import datetime
 
 BASE_DIR = os.getcwd()
 MODELS_DIR = os.path.join(BASE_DIR, "Notebooks")
@@ -43,3 +48,72 @@ def predict_stock_price(company_name, open_price, high_price, low_price, volume)
         return {"error": str(e)}
     except Exception as e:
         return {"error": f"An unexpected error occurred: {str(e)}"}
+
+def send_stock_alert_email(recipient_email, stock_symbol, current_price, percent_change):
+    server = None
+    try:
+        # Validate inputs
+        if current_price is None or percent_change is None:
+            raise ValueError("Price data is missing or invalid")
+
+        smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com")
+        smtp_port = int(os.getenv("SMTP_PORT", "587"))
+        smtp_username = os.getenv("SMTP_USERNAME")
+        smtp_password = os.getenv("SMTP_PASSWORD")
+
+        if not all([smtp_username, smtp_password]):
+            raise ValueError("SMTP credentials not configured")
+
+        msg = MIMEMultipart()
+        msg['From'] = smtp_username
+        msg['To'] = recipient_email
+        msg['Subject'] = f"Stock Alert: {stock_symbol}"
+
+        body = f"""
+        <html>
+            <body>
+                <h2>Stock Price Alert for {stock_symbol}</h2>
+                <p>Current Price: ${current_price:.2f}</p>
+                <p>24h Change: {percent_change:+.2f}%</p>
+                <p>Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+                <p>This is an automated alert from your Stock Price Predictor.</p>
+            </body>
+        </html>
+        """
+
+        msg.attach(MIMEText(body, 'html'))
+
+        # Create SMTP connection with timeout
+        server = smtplib.SMTP(smtp_server, smtp_port, timeout=30)
+        server.starttls()
+        
+        # Try to login multiple times in case of temporary connection issues
+        max_retries = 3
+        retry_delay = 5  # seconds
+        
+        for attempt in range(max_retries):
+            try:
+                server.login(smtp_username, smtp_password)
+                break
+            except smtplib.SMTPException as e:
+                if attempt == max_retries - 1:  # Last attempt
+                    raise
+                print(f"SMTP login attempt {attempt + 1} failed: {e}")
+                time.sleep(retry_delay)
+
+        server.send_message(msg)
+        return True
+
+    except (ValueError, smtplib.SMTPException) as e:
+        print(f"Error sending email alert: {e}")
+        return False
+    except Exception as e:
+        print(f"Unexpected error sending email alert: {e}")
+        return False
+    finally:
+        if server:
+            try:
+                server.quit()
+            except Exception as e:
+                print(f"Error closing SMTP connection: {e}")
+

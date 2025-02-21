@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stock Alerts</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/home.css') }}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1><i class="fas fa-bell"></i> Stock Price Alerts</h1>
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <div class="flash-messages">
+        {% for message in messages %}
+        <div class="flash-message">
+          <i class="fas fa-info-circle"></i>
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
+
+      <!-- Set New Alert Section -->
+      <div class="section alert-section">
+        <h2><i class="fas fa-plus-circle"></i> Set New Alert</h2>
+        <form
+          action="{{ url_for('set_alert') }}"
+          method="POST"
+          class="alert-form"
+        >
+          <div class="form-row">
+            <div class="form-group">
+              <label for="stock">
+                <i class="fas fa-chart-line"></i>
+                Select Stock
+              </label>
+              <div class="select-wrapper">
+                <select id="stock" name="stock" required>
+                  <option value="">Choose a stock...</option>
+                  {% for symbol, name in stocks.items() %}
+                  <option value="{{ symbol }}">
+                    {{ name }} ({{ symbol }})
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="frequency">
+                <i class="fas fa-clock"></i>
+                Alert Frequency
+              </label>
+              <div class="select-wrapper">
+                <select id="frequency" name="frequency" required>
+                  <option value="">Choose frequency...</option>
+                  {% for value, label in frequencies.items() %}
+                  <option value="{{ value }}">Every {{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn">
+            <i class="fas fa-bell"></i>
+            Set Price Alert
+          </button>
+        </form>
+      </div>
+
+      <!-- Current Alerts Section -->
+      <div class="section current-alerts">
+        <h2><i class="fas fa-list"></i> Your Current Alerts</h2>
+        {% if current_alerts %}
+        <div class="alerts-grid">
+          {% for symbol, frequency, last_alert in current_alerts %}
+          <div class="alert-card">
+            <div class="alert-info">
+              <div class="stock-header">
+                <i class="fas fa-chart-bar"></i>
+                <h3>{{ stocks[symbol] }}</h3>
+              </div>
+              <p class="symbol">{{ symbol }}</p>
+              <p class="frequency">
+                <i class="fas fa-clock"></i>
+                Every {{ frequencies[frequency] }}
+              </p>
+              {% if last_alert %}
+              <p class="last-alert">
+                <i class="fas fa-history"></i>
+                Last Alert: {{ last_alert }}
+              </p>
+              {% endif %}
+            </div>
+            <form
+              action="{{ url_for('delete_alert') }}"
+              method="POST"
+              class="delete-form"
+            >
+              <input type="hidden" name="stock" value="{{ symbol }}" />
+              <button type="submit" class="delete-btn">
+                <i class="fas fa-trash"></i>
+                Delete Alert
+              </button>
+            </form>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-alerts">
+          <i class="fas fa-bell-slash"></i>
+          <p>You haven't set any alerts yet.</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Navigation -->
+      <div class="navigation">
+        <a href="{{ url_for('home') }}" class="nav-link">
+          <i class="fas fa-home"></i>
+          Back to Home
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

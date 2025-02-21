@@ -13,6 +13,14 @@
     <div class="container">
       <h1>Stock Market Analytics & Prediction</h1>
 
+      <!-- Navigation -->
+      <div class="navigation">
+        <a href="{{ url_for('alerts') }}" class="nav-link"
+          >Manage Price Alerts</a
+        >
+        <a href="{{ url_for('logout') }}" class="nav-link">Logout</a>
+      </div>
+
       <!-- Stock Ticker Section -->
       <div class="section ticker-section">
         <h2>Live Stock Prices</h2>
